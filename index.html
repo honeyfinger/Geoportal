@@ -83,7 +83,6 @@
   </head>
   <body>
     <div id="map"></div>
-    <button id="show-layers-button">Слои</button>
 <script src="lib/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://raw.githubusercontent.com/calvinmetcalf/leaflet-ajax/master/dist/leaflet.ajax.min.js"></script>
@@ -168,56 +167,15 @@
 
       L.control.scale().addTo(map);
       
-      /*var jsonLayer = L.geoJSON('geojson/fon.geojson', {
-        style: function(feature) {
-        return { color: 'red' };
-      },
-      onEachFeature: function(feature, layer) {
-      layer.bindPopup(feature.properties.name);
-    }
-});
-      jsonLayer.addTo(map);*/
-
-
-
-      /*var geojsonLayer = new L.GeoJSON();
-      $.getJSON("geojson/fon.geojson", function(data) {
-        geojsonLayer.addData(data);
-        geojsonLayer.addTo(map);
-});*/
-
-
-var groupLayer = L.layerGroup().addTo(map);
-var polygonsLayer = L.geoJSON(null, {
-    style: function (feature) {
-        return { color: 'red' };
-    }
-});
-$.getJSON("https://github.com/tmn72/geoportal/blob/main/geojson/fon.geojson", function (data) {
-    polygonsLayer.addData(data);
-});
-$('#show-layers-button').on('click', function() {
-    groupLayer.addLayer(polygonsLayer);
-});
-
-
-       /* var geojsonLayer = new L.GeoJSON.AJAX(["geojson/fon.geojson"],{onEachFeature:popUp}).addTo(map);*/
-  /*var group = L.featureGroup();
-
-  var geojson1 = new L.GeoJSON.AJAX("geojson/water_a.geojson");       
-
-  var geojson2 = new L.GeoJSON.AJAX("geojson/waterways.geojson");       
-
-  var geojson3 = new L.GeoJSON.AJAX("geojson/railways.geojson");       
-
-  var geojson4 = new L.GeoJSON.AJAX("geojson/highways.geojson");       
- 
-      
-      group.addLayer(geojson1);
-      group.addLayer(geojson2);
-      group.addLayer(geojson3);
-      group.addLayer(geojson4);
-      group.addTo(map);*/
+  var groupLayer = L.layerGroup().addTo(map);
+  var polygonsLayer = L.geoJSON(null, {
+      style: function (feature) {
+        return {  };
+      }
+  });
+  $.getJSON("https://github.com/tmn72/geoportal/blob/main/geojson/fon.geojson", function (data) {
+      polygonsLayer.addData(data);
+  });
 
 </script>
 </body>
