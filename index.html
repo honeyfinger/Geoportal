@@ -83,10 +83,10 @@
   </head>
   <body>
     <div id="map"></div>
-   
+    <button id="show-layers-button">Слои</button>
 <script src="lib/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.js"></script>
+<script src="https://raw.githubusercontent.com/calvinmetcalf/leaflet-ajax/master/dist/leaflet.ajax.min.js"></script>
 <script src="lib/Leaflet.Coordinates-0.1.5.src.js"></script>
 <script src="lib/geosearch.umd.js"></script>
 
@@ -168,13 +168,40 @@
 
       L.control.scale().addTo(map);
       
-      var geojsonLayer = new
-  L.GeoJSON.AJAX("geojson/fon.geojson");
-geojsonLayer.addTo(map);
+      /*var jsonLayer = L.geoJSON('geojson/fon.geojson', {
+        style: function(feature) {
+        return { color: 'red' };
+      },
+      onEachFeature: function(feature, layer) {
+      layer.bindPopup(feature.properties.name);
+    }
+});
+      jsonLayer.addTo(map);*/
 
-      /*var geojsonLayer = new L.GeoJSON.AJAX("geojson/fon.geojson");
-      geojsonLayer.addTo(map);
 
+
+      /*var geojsonLayer = new L.GeoJSON();
+      $.getJSON("geojson/fon.geojson", function(data) {
+        geojsonLayer.addData(data);
+        geojsonLayer.addTo(map);
+});*/
+
+
+var groupLayer = L.layerGroup().addTo(map);
+var polygonsLayer = L.geoJSON(null, {
+    style: function (feature) {
+        return { color: 'red' };
+    }
+});
+$.getJSON("https://github.com/tmn72/geoportal/blob/main/geojson/fon.geojson", function (data) {
+    polygonsLayer.addData(data);
+});
+$('#show-layers-button').on('click', function() {
+    groupLayer.addLayer(polygonsLayer);
+});
+
+
+       /* var geojsonLayer = new L.GeoJSON.AJAX(["geojson/fon.geojson"],{onEachFeature:popUp}).addTo(map);*/
   /*var group = L.featureGroup();
 
   var geojson1 = new L.GeoJSON.AJAX("geojson/water_a.geojson");       
