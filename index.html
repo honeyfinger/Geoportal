@@ -88,7 +88,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="lib/Leaflet.Coordinates-0.1.5.src.js"></script>
 <script src="lib/geosearch.umd.js"></script>
-<script src="lib/geosearch.js"></script>
 
 <script>
   var map = L.map('map', {
@@ -164,13 +163,29 @@
 
       L.control.zoom({
 			  position: 'topright'
-    	}).addTo(map);
+      }).addTo(map);
 
       L.control.scale().addTo(map);
-
-      var geojsonLayer = new L.GeoJSON.AJAX("geojson/buildings.geojson");       
-geojsonLayer.addTo(map);
       
+  var geojsonLayer = new L.GeoJSON.AJAX("geojson/waterways.geojson");
+      geojsonLayer.addTo(map);
+
+  /*var group = L.featureGroup();
+
+  var geojson1 = new L.GeoJSON.AJAX("geojson/water_a.geojson");       
+
+  var geojson2 = new L.GeoJSON.AJAX("geojson/waterways.geojson");       
+
+  var geojson3 = new L.GeoJSON.AJAX("geojson/railways.geojson");       
+
+  var geojson4 = new L.GeoJSON.AJAX("geojson/highways.geojson");       
+ 
+      
+      group.addLayer(geojson1);
+      group.addLayer(geojson2);
+      group.addLayer(geojson3);
+      group.addLayer(geojson4);
+      group.addTo(map);*/
 
 </script>
 </body>
