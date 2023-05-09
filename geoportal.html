@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+  
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    />
+
+    <title>Геопортал городского округа города Тюмени</title>
+  
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      html, body, #map {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+</html>
+
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script src="lib/L.Geoserver.js"></script>
+
+<script>
+  var map = L.map('map', {
+    attributionControl: false,
+    zoomControl: false,
+    minZoom: 11,
+    maxBounds:[ 
+      [56.96839, 65.23384], 
+      [57.32589, 65.92023] 
+    ],
+  }).setView([57.1679, 65.4662], 11);
+  
+  var osmLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="copyright">Openstreetmap</a>'
+  })
+  osmLayer.addTo(map);
+
+  var wfsUrl = "http://localhost:8080/geoserver/wfs";
+  var layerName = "Geoportal:water_a";
+  var sldUrl = "http://localhost:8080/geoserver/web/wicket/bookmarkable/org.geoserver.wms.web.data.StyleEditPage?14&name=sld_water_a&workspace=Geoportal";
+  var getFeatureUrl = "http://localhost:8080/geoserver/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=Geoportal:water_a&outputFormat=application/json&sld_body=encodeURIComponent('https://yandex.ru/search/?text=%27%3C%3Fxml+version%3D%221.0%22+encoding%3D%22UTF-8%22%3F%3E+%3CStyledLayerDescriptor+version%3D%221.0.0%22+xsi%3AschemaLocation%3D%22http%3A%2F%2Fwww.opengis.net%2Fsld+StyledLayerDescriptor.xsd%22+xmlns%3D%22http%3A%2F%2Fwww.opengis.net%2Fsld%22+xmlns%3Aogc%3D%22http%3A%2F%2Fwww.opengis.net%2Fogc%22+xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22+xmlns%3Axsi%3D%22http%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema-instance%22%3E+%3CNamedLayer%3E+%3CName%3Ewater_a%3C%2FName%3E+%3CUserStyle%3E+%3CName%3Ewater_a%3C%2FName%3E+%3CFeatureT&lr=55&redircnt=1683346751.1')";
+  
+  $.ajax({
+    url: getFeatureUrl,
+    dataType: "json",
+    success: function (response) {
+        // Создаем новый GeoJSON-слой на основе полученных данных и применяем стиль SLD
+        var geoJsonLayer = L.geoJson(response, {
+            style: function(feature) {
+                return feature.properties.style;
+            }
+        });
+
+        // Добавляем новый слой на карту Leaflet
+        geoJsonLayer.addTo(map);
+    }
+});
+
+ /*$.ajax('http://localhost:8080/geoserver/wfs',{
+  type: 'GET',
+  data: {
+    service: 'WFS',
+    version: '2.0.0',
+    request: 'GetFeature',
+    typename: 'Geoportal:water_a',
+    srsname: 'EPSG:4326',
+    outputFormat: 'text/javascript',
+    },
+  dataType: 'jsonp',
+  jsonpCallback:'callback:handleJson',
+  jsonp:'format_options'
+ });
+
+function handleJson(data) {
+    selectedArea = L.geoJson(data).addTo(map);
+  map.fitBounds(selectedArea.getBounds());
+} */
+</script>
+
+
+
+
+
+
+
+
+
+
+
+/*var geojson = new L.GeoJSON();
+
+function getJson(data) { 
+  console.log(data),
+  geojson.addGeoJSON(data); 
+}
+
+/*var geoJsonUrl = "http://localhost:8080/geoserver/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Geoportal:water_a&srsName=EPSG:4326&outputFormat=json&format_options=callback:loadGeoJson";*/ 
+/*$.ajax({ 
+    url: "http://localhost:8080/geoserver/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=Geoportal:water_a&srsName=EPSG:4326&outputFormat=json&format_options=callback:getJson", 
+    dataType: 'json',
+    jsonpCallback: 'getJson',
+    success: 'getJson'
+});
+
+map.addLayer(geojson); */
+/*var geoJsonUrl = "http://localhost:8080/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=Geoportal:water_a&outputFormat=application/json";
+$.ajax({
+  type: "GET",
+  url: geoJsonUrl,
+  dataType : 'json',
+  jsuccess: 'loadGeoJson',
+  jsonp: false 
+});*/
+
+  /*var wfs_url = "http://localhost:8080/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=Geoportal:water_a&outputFormat=application/json&count=10000&srsName=epsg:4326";
+  $.getJSON(wfs_url).then((res) => {
+  var layer = L.getJSON(res).addTo(map);
+  map.fitBounds(layer.getBounds());
+});*/
+   /* var wfsLayer = L.Geoserver.wfs("http://localhost:8080/geoserver/wfs", {
+    layers: "Geoportal:buildings",
+  });
+  wfsLayer.addTo(map);*/

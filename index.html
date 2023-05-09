@@ -86,6 +86,7 @@
    
 <script src="lib/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.js"></script>
 <script src="lib/Leaflet.Coordinates-0.1.5.src.js"></script>
 <script src="lib/geosearch.umd.js"></script>
 
@@ -167,7 +168,11 @@
 
       L.control.scale().addTo(map);
       
-  var geojsonLayer = new L.GeoJSON.AJAX("geojson/waterways.geojson");
+      var geojsonLayer = new
+  L.GeoJSON.AJAX("geojson/fon.geojson");
+geojsonLayer.addTo(map);
+
+      /*var geojsonLayer = new L.GeoJSON.AJAX("geojson/fon.geojson");
       geojsonLayer.addTo(map);
 
   /*var group = L.featureGroup();
