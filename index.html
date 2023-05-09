@@ -170,7 +170,11 @@
   var groupLayer = L.layerGroup().addTo(map);
   var polygonsLayer = L.geoJSON(null, {
       style: function (feature) {
-        return {  };
+        return {
+          fillColor: '#ffffff',
+          fillOpacity: 1,
+          weight: 0
+        };
       }
   });
   $.getJSON("https://github.com/tmn72/geoportal/blob/main/geojson/fon.geojson", function (data) {
