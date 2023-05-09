@@ -174,7 +174,7 @@
             L.geoJSON(geojson, {
               style: function(feature) {
                 return {
-                  fillColor: "white",
+                  fillColor: "#fafafa",
                   fillOpacity: 1,
                   weight: 0
                 };
@@ -190,7 +190,49 @@
           }).addTo(map);
         });
       });
-
+      
+      fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/waterways.geojson")
+        .then(function(resp) {
+          resp.json().then(function(geojson) {
+            L.geoJSON(geojson, {
+              style: function(feature) {
+                return {
+                  fillColor: "#2930fa",
+                  fillOpacity: 1,
+                  weight: 1
+                };
+              },
+            onEachFeature: function(feature, layer) {
+              const name = feature.properties.NAME;
+              if (name) {
+                layer.bindTooltip(NAME);
+              }
+            },
+          }).addTo(map);
+        });
+      });     
+      fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/water_a.geojson")
+        .then(function(resp) {
+          resp.json().then(function(geojson) {
+            L.geoJSON(geojson, {
+              style: function(feature) {
+                return {
+                  fillColor: "#2930fa",
+                  fillOpacity: 1,
+                  weight: 0
+                };
+              },
+            onEachFeature: function(feature, layer) {
+              const name = feature.properties.NAME;
+              if (name) {
+                layer.bindTooltip(feature.properties.NAME, {
+                  permanent: true
+                });
+              }
+            },
+          }).addTo(map);
+        });
+      });
 </script>
 </body>
 </html>
