@@ -167,8 +167,7 @@
 
       L.control.scale().addTo(map);
       
-  var groupLayer = L.layerGroup().addTo(map);
-  var polygonsLayer = L.geoJSON(null, {
+  var backgroundLayer = L.geoJSON(null, {
       style: function (feature) {
         return {
           fillColor: '#ffffff',
@@ -178,7 +177,7 @@
       }
   });
   $.getJSON("https://github.com/tmn72/geoportal/blob/main/geojson/fon.geojson", function (data) {
-      polygonsLayer.addData(data);
+    backgroundLayer.addData(data);
   });
 
 </script>
