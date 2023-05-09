@@ -168,9 +168,9 @@
 
       L.control.scale().addTo(map);
 
-      $.getJSON("geojson/buildings.geojson", function(data) {
-    var geojsonLayer = L.geoJSON(data).addTo(map);
-});
+      var geojsonLayer = new L.GeoJSON.AJAX("geojson/buildings.geojson");       
+geojsonLayer.addTo(map);
+      
 
 </script>
 </body>
