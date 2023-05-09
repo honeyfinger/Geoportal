@@ -167,11 +167,17 @@
 
       L.control.scale().addTo(map);
 
-      fetch('https://github.com/tmn72/geoportal/blob/main/geojson/fon.geojson')
-      .then(response => response.json())
-      .then(data => {
-        L.geoJSON(data).addTo(map);
-      });
+      
+      var myLayer = L.geoJSON();
+
+fetch('https://github.com/tmn72/geoportal/blob/main/geojson/fon.geojson')
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(data) {
+    myLayer.addData(data);
+    myLayer.addTo(map);
+  });
 </script>
 </body>
 </html>
