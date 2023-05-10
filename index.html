@@ -12,8 +12,8 @@
       href="images/logo.png"
     />
     <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.13.0/Control.Geocoder.css"
+	  rel="stylesheet"
+      href="https://unpkg.com/leaflet-geosearch@3.0.0/dist/geosearch.css"
     />
   
     <link
@@ -54,11 +54,11 @@
         line-height: 12px;
         background-color: rgba(255, 255, 255, 1);
         bottom: -5px;
-        box-shadow: 0 0 9px #0c0fc0e6;
+        box-shadow: 0 0 9px #0846cd;
       }
 
       .leaflet-control-layers-toggle {
-        background-size: contain;
+        /*background-size: contain;*/
         background-repeat: no-repeat;
         display: flex;
         justify-content: center;
@@ -229,6 +229,9 @@
                   permanent: true
                 });
               }
+				layer.on('click', function(e) {
+					map.flyToBounds(this.getBounds(), {padding: [50, 30]});
+          });
             },
           }).addTo(map);
         });
