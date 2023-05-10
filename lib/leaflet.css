@@ -343,6 +343,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
 
 /* layers control */
+.my-custom-class-1.my-layers-toggle .leaflet-control-layers-toggle {
+	background-image: url(images/layers-2x.svg);
+	background-size: 28px 28px;
+  	}
+  
+  .my-custom-class-2.my-layers-toggle .leaflet-control-layers-toggle {
+	background-image: url(images/minus.svg);
+	background-size: 28px 28px;
+  	}
 
 .leaflet-control-layers {
 	box-shadow: 0 1px 5px rgba(115, 48, 48, 0.4);
