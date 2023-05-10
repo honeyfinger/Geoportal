@@ -190,52 +190,62 @@
           }).addTo(map);
         });
       });
-      
-      fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/waterways.geojson")
-        .then(function(resp) {
-          resp.json().then(function(geojson) {
-            L.geoJSON(geojson, {
-              style: function(feature) {
-                return {
-                  fillColor: "#2930fa",
-                  fillOpacity: 1,
-                  weight: 1
-                };
-              },
-            onEachFeature: function(feature, layer) {
-              const name = feature.properties.NAME;
-              if (name) {
-                layer.bindTooltip(NAME);
-              }
-            },
-          }).addTo(map);
-        });
-      });     
-      fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/water_a.geojson")
-        .then(function(resp) {
-          resp.json().then(function(geojson) {
-            L.geoJSON(geojson, {
-              style: function(feature) {
-                return {
-                  fillColor: "#2930fa",
-                  fillOpacity: 1,
-                  weight: 0
-                };
-              },
-            onEachFeature: function(feature, layer) {
-              const name = feature.properties.NAME;
-              if (name) {
-                layer.bindTooltip(feature.properties.NAME, {
-                  permanent: true
-                });
-              }
-				layer.on('click', function(e) {
-					map.flyToBounds(this.getBounds(), {padding: [50, 30]});
-          });
-            },
-          }).addTo(map);
-        });
+
+const waterwaysLayer = L.geoJSON();
+
+const waterALayer = L.geoJSON();
+
+fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/waterways.geojson")
+  .then(response => response.json())
+  .then(data => {
+    waterwaysLayer.addData(data);
+    waterwaysLayer.eachLayer(function(layer) {
+      layer.on('click', function(e) {
+        map.flyToBounds(this.getBounds(), {padding: [50, 50]});
       });
+    });
+  })
+  .catch(error => console.log(error));
+
+fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/water_a.geojson")
+  .then(response => response.json())
+  .then(data => {
+    waterALayer.addData(data);
+    waterALayer.eachLayer(function(layer) {
+      layer.on('click', function(e) {
+        map.flyToBounds(this.getBounds(), {padding: [50, 50]});
+      });
+    });
+  })
+  .catch(error => console.log(error));
+
+const waterwaysGroup = L.layerGroup([waterwaysLayer]);
+const waterAGroup = L.layerGroup([waterALayer]);
+
+const controlLayers2 = L.control.layers(null, {
+  "Гидрография (линии)": waterwaysGroup,
+  "Гидрография (полигоны)": waterAGroup
+});
+
+controlLayers2.addTo(map);
+
+
+const toggle1 = L.control.layers.toggle(undefined, undefined, {
+  collapsed: false,
+  exclusiveGroups: ["ЕЭКО", "2ГИС", "OSM", "Google", "Mapbox", "ПКК"],
+  className: "my-custom-class-1 my-layers-toggle",
+  containerWidth: "auto",
+  containerHeight: "auto"
+}).addTo(map);
+
+const toggle2 = L.control.layers.toggle(undefined, undefined, {
+  collapsed: false,
+  exclusiveGroups: ["Гидрография (линии)", "Гидрография (полигоны)"],
+  className: "my-custom-class-2 my-layers-toggle",
+  containerWidth: "auto",
+  containerHeight: "auto"
+}).addTo(map);
+
 </script>
 </body>
 </html>
