@@ -296,7 +296,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	}
 .leaflet-bar a:hover,
 .leaflet-bar a:focus {
-	background-color: #f4f4f4;
+	background-color: #e2e9fb;
 	}
 .leaflet-bar a:first-child {
 	border-top-left-radius: 4px;
@@ -309,7 +309,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	}
 .leaflet-bar a.leaflet-disabled {
 	cursor: default;
-	background-color: #f4f4f4;
+	background-color: #e2e9fb;
 	color: #bbb;
 	}
 
@@ -350,18 +350,16 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	border-radius: 5px;
 	}
 .leaflet-control-layers-toggle {
-	background-image: url(images/layers.png);
-	width: 36px;
-	height: 36px;
+	background-image: url(images/layers.svg);
+	background-size: 28px 28px;
 	}
 .leaflet-retina .leaflet-control-layers-toggle {
 	background-image: url(images/layers-2x.svg);
-	background-size: 22px 22px;
-	margin: 0 auto;
+	background-size: 28px 28px;
 	}
 .leaflet-touch .leaflet-control-layers-toggle {
-	width: 38px;
-	height: 38px;
+	width: 40px;
+	height: 40px;
 	}
 .leaflet-control-layers .leaflet-control-layers-list,
 .leaflet-control-layers-expanded .leaflet-control-layers-toggle {
@@ -446,7 +444,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	-moz-box-sizing: border-box;
 	     box-sizing: border-box;
 	background: rgba(255, 255, 255, 1);
-	box-shadow: 0 0 9px #0c0fc0e6;
+	box-shadow: 0 0 9px #0846cd;
 	}
 .leaflet-control-scale-line:not(:first-child) {
 	border-top: 2px solid #777;
@@ -465,7 +463,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .leaflet-touch .leaflet-control-layers,
 .leaflet-touch .leaflet-bar {
 	/*border: 2px solid rgba(0,0,0,0.2);*/
-	box-shadow: 0 0 6px #0c0fc0e6;
+	box-shadow: 0 0 8px #0846cd;
 	background-clip: padding-box;
 	}
 
