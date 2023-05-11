@@ -4,13 +4,18 @@
 .leaflet-control-geosearch *:after {
   box-sizing: border-box;
 }
-
+.leaflet-control-geosearch a.leaflet-bar-part {
+  background-image: url('images/search.svg');
+  background-size: 85%;
+  background-repeat: no-repeat;
+}  
 /* leaflet button styling */
 .leaflet-control-geosearch .leaflet-bar-part {
   border-radius: 4px;
   border-bottom: none;
 }
 
+}
 .leaflet-control-geosearch a.leaflet-bar-part:before,
 .leaflet-control-geosearch a.leaflet-bar-part:after {
   position: absolute;
@@ -74,15 +79,14 @@
   display: none;
   position: absolute;
   top: 0;
-  left: 36px;
+  left: 42px;
   border-radius: 0 4px 4px 0;
-  background-color: #fff;
+  /*background-color: #fff;*/
   background-clip: padding-box;
   z-index: -1;
   height: auto;
   margin: 0;
   padding: 0 8px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
 }
 
 .leaflet-geosearch-button form.open {
@@ -98,21 +102,22 @@
 }
 
 .leaflet-geosearch-button form {
-  max-width: 350px;
+  max-width: 308px;
 }
 
 .leaflet-control-geosearch form input {
-  min-width: 200px;
-  width: 100%;
+  min-width: 290px;
+  width: 60%;
   outline: none;
   border: none;
   margin: 0;
   padding: 0;
   font-size: 12px;
-  height: 30px;
+  height: 26px;
   border: none;
-  border-radius: 0 4px 4px 0;
+  border-radius: 4px 4px 4px 4px;
   text-indent: 8px;
+  box-shadow: 0 0 8px #0846cd;
 }
 
 .leaflet-touch .leaflet-geosearch-bar form {
@@ -126,6 +131,9 @@
 
 .leaflet-control-geosearch .results {
   background: #fff;
+  width: 500px;
+  border-radius: 4px 4px 4px 4px;
+  box-shadow: 0 0 8px #0846cd;
 }
 
 .leaflet-control-geosearch .results > * {
@@ -151,7 +159,7 @@
 }
 
 /* add missing border to form */
-.leaflet-control-geosearch .results.active:after {
+/*.leaflet-control-geosearch .results.active:after {
   content: '';
   display: block;
   width: 0;
@@ -168,7 +176,7 @@
 /* animations */
 @keyframes spin {
   0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }*/
 }
 
 .leaflet-top .leaflet-geosearch-bar,
@@ -223,7 +231,7 @@
   line-height: 26px;
   padding: 0 8px;
   right: 0;
-  top: 0;
+  top: -8px;
   cursor: pointer;
   border: none;
   text-decoration: none;
@@ -232,7 +240,7 @@
 }
 
 .leaflet-touch .leaflet-control-geosearch button.reset {
-  line-height: 30px;
+  line-height: 23px;
 }
 
 .leaflet-control-geosearch button.reset:hover {

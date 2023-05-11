@@ -11,10 +11,6 @@
       rel="icon"
       href="images/logo.png"
     />
-    <link
-	  rel="stylesheet"
-      href="https://unpkg.com/leaflet-geosearch@3.0.0/dist/geosearch.css"
-    />
   
     <link
       rel="stylesheet"
@@ -22,8 +18,13 @@
     />
     
     <link
-      rel="icon"
+      rel="stylesheet"
       href="lib/geosearch.css"
+    />
+
+	<link
+      rel="stylesheet"
+      href="lib/leaflet.draw.css"
     />
 
     <title>Геопортал города Тюмени</title>
@@ -75,20 +76,50 @@
       }
 
       .leaflet-control-geosearch {
-  position: relative;
-  bottom: -50px;
-}
-      
+		position: relative;
+		bottom: 1px;
+	  }
+	  
+	 
+	 
+	  
     </style>
   </head>
   <body>
     <div id="map"></div>
-<script src="lib/leaflet.js"></script>
+<script src="lib/leaflet-src.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://raw.githubusercontent.com/calvinmetcalf/leaflet-ajax/master/dist/leaflet.ajax.min.js"></script>
 <script src="lib/Leaflet.Coordinates-0.1.5.src.js"></script>
 <script src="lib/geosearch.umd.js"></script>
-
+<script src="lib/src/Leaflet.draw.js"></script>
+<script src="lib/src/Leaflet.Draw.Event.js"></script>
+<script src="lib/src/Toolbar.js"></script>
+<script src="lib/src/Tooltip.js"></script>
+<script src="lib/ext/LatLngUtil.js"></script>
+<script src="lib/ext/LineUtil.Intersect.js"></script>
+<script src="lib/ext/Polygon.Intersect.js"></script>
+<script src="lib/ext/Polyline.Intersect.js"></script>
+<script src="lib/ext/TouchEvents.js"></script>
+<script src="lib/draw/DrawToolbar.js"></script>
+<script src="lib/draw/handler/Draw.Feature.js"></script>
+<script src="lib/draw/handler/Draw.SimpleShape.js"></script>
+<script src="lib/draw/handler/Draw.Polyline.js"></script>
+<script src="lib/draw/handler/Draw.Marker.js"></script>
+<script src="lib/draw/handler/Draw.CircleMarker.js"></script>
+<script src="lib/draw/handler/Draw.Circle.js"></script>
+<script src="lib/draw/handler/Draw.Polygon.js"></script>
+<script src="lib/draw/handler/Draw.Rectangle.js"></script>
+<script src="lib/edit/EditToolbar.js"></script>
+<script src="lib/edit/handler/EditToolbar.Edit.js"></script>
+<script src="lib/edit/handler/EditToolbar.Delete.js"></script>
+<script src="lib/src/Control.Draw.js"></script>
+<script src="lib/edit/handler/Edit.Poly.js"></script>
+<script src="lib/edit/handler/Edit.SimpleShape.js"></script>
+<script src="lib/edit/handler/Edit.Marker.js"></script>
+<script src="lib/edit/handler/Edit.CircleMarker.js"></script>
+<script src="lib/edit/handler/Edit.Circle.js"></script>
+<script src="lib/edit/handler/Edit.Rectangle.js"></script>
 <script>
   var map = L.map('map', {
     attributionControl: false,
@@ -115,11 +146,12 @@
     ].join(',')
     }
   });
+  
   const search = new GeoSearch.GeoSearchControl({
     provider: provider,
-    style: 'bar',
+    style: 'button',
     autoComplete: true,
-    autoCompleteDelay: 250,
+    autoCompleteDelay: 1200,
     searchLabel: 'Введите адрес',
     notFoundMessage: 'Ничего не найдено',
     showMarker: true,
@@ -134,8 +166,7 @@
   });
   
   map.addControl(search);
-
-  
+    
   var baseLayers = {
         "ЕЭКО": L.tileLayer("https://ngw.fppd.cgkipd.ru/tile/56/{z}/{x}/{y}.png", {
         }),
@@ -147,7 +178,7 @@
         }),
         "Mapbox": L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9uZXlmaW5nZXIiLCJhIjoiY2xoZmRnMGY4MTVlYTNzbnY2YTYydmFpZiJ9.hLzJmqq2UXv9czh28X0e-w", {
         }),
-        "ПКК": L.tileLayer.wms("https://pkk.rosreestr.ru/arcgis/services/PKK6/CadastreWMS/MapServer/WmsServer", {
+        "ПКК": L.tileLayer("https://gext.ru/rosreestr_xyz/{z}/{x}/{y}.png", {
         }),
   };
 
@@ -167,7 +198,6 @@
 
       L.control.scale().addTo(map);
 
-      
       fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/fon.geojson")
         .then(function(resp) {
           resp.json().then(function(geojson) {

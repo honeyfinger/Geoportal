@@ -408,8 +408,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
 	background-image: url(images/marker-icon.png);
 	}
-
-
+	
 /* attribution and scale controls */
 
 .leaflet-container .leaflet-control-attribution {
@@ -527,7 +526,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .leaflet-popup-tip {
 	background: white;
 	color: #333;
-	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	
+	border-radius: 4px 4px 4px 4px;
+	box-shadow: 0 0 8px #0846cd;
 	}
 .leaflet-container a.leaflet-popup-close-button {
 	position: absolute;
@@ -679,4 +680,17 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	.leaflet-control-zoom-out {
 		background-image:  url('images/minus.svg');
 		background-size: 28px 28px;
+	}
+	.leaflet-control-geosearch .search-input,
+	.leaflet-control-geosearch button {
+		font-size: 14px;
+		padding: 0px 4px;
+		float: right;
+		margin-right: 10px;
+		margin-top: 10px;
+	}
+	.leaflet-control-geosearch a.leaflet-bar-part {
+		background-image: url('images/search.svg');
+		background-size: contain;
+		background-repeat: no-repeat;
 	}
