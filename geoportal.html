@@ -1,52 +1,364 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
   <head>
     <meta charset="UTF-8">
+
     <link rel="icon" href="lib/images/logo.png"/>
+    <link rel="stylesheet" href="lib/leaflet.css"/>
+    <link rel="stylesheet" href="lib/images/logo.png"/>
+    <link rel="stylesheet" href="lib/geosearch.css"/>
+    <link rel="stylesheet" href="lib/leaflet.draw.css"/>
+    <link rel="stylesheet" href="lib/styledLayerControl.css"/>
+    
+    <script src="lib/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://raw.githubusercontent.com/calvinmetcalf/leaflet-ajax/master/dist/leaflet.ajax.min.js"></script>
+    <script src="lib/Leaflet.Coordinates-0.1.5.src.js"></script>
+    <script src="lib/geosearch.umd.js"></script>
+    <script src="lib/leaflet.draw.js"></script>
+    <script src="lib/styledLayerControl.js"></script>
+
     <title>Геопортал города Тюмени</title>
+
     <style>
-      html, body {
-        height: 100%;
+      body {
         margin: 0;
         padding: 0;
       }
-      .bg-image {
-        background-image: url('lib/images/tyumen.png');
-        background-size: cover;
-        background-position: center center;
+      html, body, #map {
         height: 100%;
+        width: 100%;
+      
       }
-      .centered-text {
-        font-family: Tahoma, sans-serif;
-        font-size: 48px;
-        color: rgb(255, 255, 255);
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+      .leaflet-control-scale {
+        font-size: 12px;
+      }
+      .leaflet-control-scale .leaflet-control-scale-line:last-child {
+        display: none;
+      }
+
+      .leaflet-control-coordinates {
+        border-radius: 7px;
+        padding: 5px 10px;
+        font-size: 13px;
+        height: 10px;
         text-align: center;
+        line-height: 12px;
+        background-color: rgba(255, 255, 255, 1);
+        bottom: -5px;
+        box-shadow: 0 0 9px #0846cd;
       }
-      .start-button {
-        background-color: #fff;
-        color: #000;
-        font-family: Tahoma, sans-serif;
-        font-size: 24px;
-        border-radius: 50%;
-        padding: 20px;
-        border: none;
-        cursor: pointer;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+
+      .leaflet-control-layers-toggle {
+        /*background-size: contain;*/
+        background-repeat: no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
+
+      .leaflet-control-layers {
+      /*width: 20px;*/
+      /*height: 20px;*/
+      /*border: 2px solid #ccc;*/
+        border-radius: 8px;
+        line-height: 12px;
+        background-color: rgba(255, 255, 255, 1);
+      }
+
+      .leaflet-control-geosearch {
+		position: relative;
+		bottom: 1px;
+	  }
+	  
     </style>
   </head>
   <body>
-    <div class="bg-image">
-      <div class="centered-text">Геопортал города Тюмени
-      <button class="start-button" onclick="location.href='index.html'">Начать</button>
-    </div>
-    </div>
-  </body>
+    <div id="map"></div>
+<script>
+  var map = L.map('map', {attributionControl: false,
+    zoomControl: false,
+    minZoom: 11,
+    maxBounds:[ 
+      [56.96839, 65.23384], 
+      [57.32589, 65.92023] 
+    ],
+  }).setView([57.1679, 65.4662], 11);
+
+  var osmLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  }).addTo(map);
+  
+  const provider = new GeoSearch.OpenStreetMapProvider({
+    params: {
+    bounded: 1,
+    countrycodes: 'ru',
+    viewbox: [
+      65.2338,
+      56.9684,
+      65.9202,
+      57.3259
+    ].join(',')
+    }
+  });
+  
+  const search = new GeoSearch.GeoSearchControl({
+    provider: provider,
+    style: 'button',
+    autoComplete: true,
+    autoCompleteDelay: 1200,
+    searchLabel: 'Введите адрес',
+    notFoundMessage: 'Ничего не найдено',
+    showMarker: true,
+    showPopup: true,
+    marker: {
+      icon: new L.Icon.Default(),
+      draggable: false,
+    },
+    popupFormat: ({ query, result }) => result.label,
+    resultFormat: ({ result }) => result.label,
+    keepResult: true,
+  });
+  
+  map.addControl(search);
+
+var drawnItems = new L.FeatureGroup();
+
+map.addLayer(drawnItems);
+
+var drawControl = new L.Control.Draw({
+  draw: {
+    position: 'topleft',
+    marker: false,
+    circlemarker: false,
+    polygon: {
+      allowIntersection: false,
+      drawError: {
+        color: '#0846cd',
+        timeout: 1000
+      },
+      shapeOptions: {
+        color: '#0846cd'
+      },
+      showArea: true
+    },
+    polyline: {
+      shapeOptions: {
+        color: '#0846cd'
+      }
+    },
+    circle: {
+      shapeOptions: {
+        color: '#0846cd'
+      }
+    },
+    rectangle: {
+      shapeOptions: {
+        color: '#0846cd'
+      }
+    }
+  },
+  edit: {
+    featureGroup: drawnItems
+  }
+});
+
+map.addControl(drawControl);
+
+map.on('draw:created', function (e) {
+  var type = e.layerType,
+      layer = e.layer;
+  
+  if (type === 'circle') {
+    
+    drawnItems.addLayer(layer);
+    
+    var centerLatLng = layer.getLatLng();
+    var marker = L.marker(centerLatLng).addTo(drawnItems);
+    
+    var radius_meters = layer.getRadius();
+    var radius_display;    
+    if (radius_meters < 1000) {
+      radius_display = radius_meters.toFixed(0) + ' м';
+    } else {
+      var radius_kms = radius_meters / 1000;
+      if (radius_kms < 1) {
+        radius_display = radius_meters.toFixed(0) + ' м';
+      } else {
+        radius_display = radius_kms.toFixed(2) + ' Км';
+      }
+    }    
+    var area_meters = Math.PI * Math.pow(radius_meters, 2);
+    var area_display;
+    if (area_meters < 10000) {
+      area_display = area_meters.toFixed(2) + ' м²';
+    } else {
+      area_display = (area_meters / 10000).toFixed(2) + ' Га';
+    }    
+    layer.bindPopup('Радиус: ' + radius_display + '<br>Площадь: ' + area_display);
+    marker.bindPopup('Центр окружности');
+    
+  } else if (type === 'polygon' || type === 'rectangle') {
+    
+    drawnItems.addLayer(layer);
+    
+    var area_meters = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+    var area_display = (area_meters < 10000) ? (area_meters.toFixed(2) + ' м²') : ((area_meters / 10000).toFixed(2) + ' Га');
+    
+    layer.bindPopup('Площадь: ' + area_display); 
+    
+  } else if (type === 'polyline') {
+    
+    drawnItems.addLayer(layer);
+
+  var latlngs = layer.getLatLngs();
+  var length_meters = 0;
+
+  for (var i = 0; i < latlngs.length - 1; i++) {
+    var j = i + 1;
+    var p1 = L.latLng(latlngs[i].lat, latlngs[i].lng);
+    var p2 = L.latLng(latlngs[j].lat, latlngs[j].lng);
+    length_meters += p1.distanceTo(p2);
+  }
+  
+  var length_display;
+  if (length_meters < 1000) {
+    length_display = length_meters.toFixed(0) + ' м';
+  } else {
+    length_display = (length_meters / 1000).toFixed(2) + ' Км';
+  }
+
+  layer.bindPopup('Длина: ' + length_display);
+}
+});
+
+  
+ 
+
+
+  const baseLayers = {
+        "ЕЭКО": L.tileLayer("https://ngw.fppd.cgkipd.ru/tile/56/{z}/{x}/{y}.png", {
+        }),
+        "2ГИС": L.tileLayer("https://tile3.maps.2gis.com/tiles?x={x}&y={y}&z={z}&v=1.1", {
+        }),        
+        "OSM": L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        }),
+        "Google": L.tileLayer("https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
+        }),
+        "Mapbox": L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9uZXlmaW5nZXIiLCJhIjoiY2xoZmRnMGY4MTVlYTNzbnY2YTYydmFpZiJ9.hLzJmqq2UXv9czh28X0e-w", {
+        }),
+        "ПКК": L.tileLayer("https://gext.ru/rosreestr_xyz/{z}/{x}/{y}.png", {
+        }),
+  };
+
+  L.control.layers(baseLayers).addTo(map);
+
+  var layersButton = document.getElementsByClassName('leaflet-control-layers-toggle')[0];
+  var img = document.createElement('img');
+      img.src = 'lib/images/layers-2x.svg';
+      img.style.width = '75%';
+      layersButton.appendChild(img);
+      L.control.coordinates({
+        position: "bottomright",
+        labelTemplateLat: "Широта: {y}",
+        labelTemplateLng: "Долгота: {x}",
+        useDMS: true,
+        useLatLngOrder: true,
+      }).addTo(map);
+
+      L.control.zoom({
+			  position: 'topright'
+      }).addTo(map);
+
+      L.control.scale().addTo(map);
+
+      fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/fon.geojson")
+        .then(function(resp) {
+          resp.json().then(function(geojson) {
+            L.geoJSON(geojson, {
+              style: function(feature) {
+                return {
+                  fillColor: "#fafafa",
+                  fillOpacity: 1,
+                  weight: 0
+                };
+              },
+            onEachFeature: function(feature, layer) {
+              const name = feature.properties.NAME;
+              if (name) {
+                layer.bindTooltip(feature.properties.NAME, {
+                  permanent: true
+                });
+              }
+            },
+          }).addTo(map);
+        });
+      });
+
+      const waterwaysLayer = L.geoJSON(null, {
+  onEachFeature: function(feature, layer) {
+    let popupContent = '';
+    for (let key in feature.properties) {
+      popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
+    }
+    layer.bindPopup(popupContent);
+    layer.on('click', function(e) {
+      map.flyToBounds(this.getBounds(), {padding: [50, 50]});
+    });
+  }
+});
+
+fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/waterways.geojson")
+  .then(response => response.json())
+  .then(data => {
+    waterwaysLayer.addData(data);
+  })
+  .catch(error => console.log(error));
+
+const waterALayer = L.geoJSON(null, {
+  onEachFeature: function(feature, layer) {
+    let popupContent = '';
+    for (let key in feature.properties) {
+      popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
+    }
+    layer.bindPopup(popupContent);
+    layer.on('click', function(e) {
+      map.flyToBounds(this.getBounds(), {padding: [50, 50]});
+    });
+  }
+});
+
+fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/water_a.geojson")
+  .then(response => response.json())
+  .then(data => {
+    waterALayer.addData(data);
+  })
+  .catch(error => console.log(error));
+
+const waterwaysGroup = L.layerGroup([waterwaysLayer]);
+const waterAGroup = L.layerGroup([waterALayer]);
+
+const overlays = [
+  {
+    groupName: "Гидрография",
+    expanded: false,
+    layers: {
+      "Гидрография (линии)": waterwaysGroup,
+      "Гидрография (полигоны)": waterAGroup
+    }
+  }
+];
+
+L.Control.styledLayerControl(null, overlays, {
+  collapsed: true,
+  position: 'topright'
+}).addTo(map);
+
+var overlaysButton = document.getElementsByClassName('leaflet-control-layers-toggle')[1];
+var img = document.createElement('img');
+img.src = 'lib/images/layer.svg';
+img.style.width = '80%';
+overlaysButton.appendChild(img);
+
+</script>
+</body>
 </html>
