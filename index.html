@@ -22,10 +22,23 @@
       href="lib/geosearch.css"
     />
 
-	<link
+	  <link
       rel="stylesheet"
       href="lib/leaflet.draw.css"
     />
+
+    <link
+      rel="stylesheet"
+      href="lib/styledLayerControl.css"
+    />
+    
+    <script src="lib/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://raw.githubusercontent.com/calvinmetcalf/leaflet-ajax/master/dist/leaflet.ajax.min.js"></script>
+    <script src="lib/Leaflet.Coordinates-0.1.5.src.js"></script>
+    <script src="lib/geosearch.umd.js"></script>
+    <script src="lib/leaflet.draw.js"></script>
+    <script src="lib/styledLayerControl.js"></script>
 
     <title>Геопортал города Тюмени</title>
 
@@ -80,49 +93,12 @@
 		bottom: 1px;
 	  }
 	  
-	 
-	 
-	  
     </style>
   </head>
   <body>
     <div id="map"></div>
-<script src="lib/leaflet-src.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://raw.githubusercontent.com/calvinmetcalf/leaflet-ajax/master/dist/leaflet.ajax.min.js"></script>
-<script src="lib/Leaflet.Coordinates-0.1.5.src.js"></script>
-<script src="lib/geosearch.umd.js"></script>
-<script src="lib/src/Leaflet.draw.js"></script>
-<script src="lib/src/Leaflet.Draw.Event.js"></script>
-<script src="lib/src/Toolbar.js"></script>
-<script src="lib/src/Tooltip.js"></script>
-<script src="lib/ext/LatLngUtil.js"></script>
-<script src="lib/ext/LineUtil.Intersect.js"></script>
-<script src="lib/ext/Polygon.Intersect.js"></script>
-<script src="lib/ext/Polyline.Intersect.js"></script>
-<script src="lib/ext/TouchEvents.js"></script>
-<script src="lib/draw/DrawToolbar.js"></script>
-<script src="lib/draw/handler/Draw.Feature.js"></script>
-<script src="lib/draw/handler/Draw.SimpleShape.js"></script>
-<script src="lib/draw/handler/Draw.Polyline.js"></script>
-<script src="lib/draw/handler/Draw.Marker.js"></script>
-<script src="lib/draw/handler/Draw.CircleMarker.js"></script>
-<script src="lib/draw/handler/Draw.Circle.js"></script>
-<script src="lib/draw/handler/Draw.Polygon.js"></script>
-<script src="lib/draw/handler/Draw.Rectangle.js"></script>
-<script src="lib/edit/EditToolbar.js"></script>
-<script src="lib/edit/handler/EditToolbar.Edit.js"></script>
-<script src="lib/edit/handler/EditToolbar.Delete.js"></script>
-<script src="lib/src/Control.Draw.js"></script>
-<script src="lib/edit/handler/Edit.Poly.js"></script>
-<script src="lib/edit/handler/Edit.SimpleShape.js"></script>
-<script src="lib/edit/handler/Edit.Marker.js"></script>
-<script src="lib/edit/handler/Edit.CircleMarker.js"></script>
-<script src="lib/edit/handler/Edit.Circle.js"></script>
-<script src="lib/edit/handler/Edit.Rectangle.js"></script>
 <script>
-  var map = L.map('map', {
-    attributionControl: false,
+  var map = L.map('map', {attributionControl: false,
     zoomControl: false,
     minZoom: 11,
     maxBounds:[ 
@@ -166,8 +142,122 @@
   });
   
   map.addControl(search);
+
+var drawnItems = new L.FeatureGroup();
+
+map.addLayer(drawnItems);
+
+var drawControl = new L.Control.Draw({
+  draw: {
+    position: 'topleft',
+    marker: false,
+    circlemarker: false,
+    polygon: {
+      allowIntersection: false,
+      drawError: {
+        color: '#0846cd',
+        timeout: 1000
+      },
+      shapeOptions: {
+        color: '#0846cd'
+      },
+      showArea: true
+    },
+    polyline: {
+      shapeOptions: {
+        color: '#0846cd'
+      }
+    },
+    circle: {
+      shapeOptions: {
+        color: '#0846cd'
+      }
+    },
+    rectangle: {
+      shapeOptions: {
+        color: '#0846cd'
+      }
+    }
+  },
+  edit: {
+    featureGroup: drawnItems
+  }
+});
+
+map.addControl(drawControl);
+
+map.on('draw:created', function (e) {
+  var type = e.layerType,
+      layer = e.layer;
+  
+  if (type === 'circle') {
     
-  var baseLayers = {
+    drawnItems.addLayer(layer);
+    
+    var centerLatLng = layer.getLatLng();
+    var marker = L.marker(centerLatLng).addTo(drawnItems);
+    
+    var radius_meters = layer.getRadius();
+    var radius_display;    
+    if (radius_meters < 1000) {
+      radius_display = radius_meters.toFixed(0) + ' м';
+    } else {
+      var radius_kms = radius_meters / 1000;
+      if (radius_kms < 1) {
+        radius_display = radius_meters.toFixed(0) + ' м';
+      } else {
+        radius_display = radius_kms.toFixed(2) + ' Км';
+      }
+    }    
+    var area_meters = Math.PI * Math.pow(radius_meters, 2);
+    var area_display;
+    if (area_meters < 10000) {
+      area_display = area_meters.toFixed(2) + ' м²';
+    } else {
+      area_display = (area_meters / 10000).toFixed(2) + ' Га';
+    }    
+    layer.bindPopup('Радиус: ' + radius_display + '<br>Площадь: ' + area_display);
+    marker.bindPopup('Центр окружности');
+    
+  } else if (type === 'polygon' || type === 'rectangle') {
+    
+    drawnItems.addLayer(layer);
+    
+    var area_meters = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+    var area_display = (area_meters < 10000) ? (area_meters.toFixed(2) + ' м²') : ((area_meters / 10000).toFixed(2) + ' Га');
+    
+    layer.bindPopup('Площадь: ' + area_display); 
+    
+  } else if (type === 'polyline') {
+    
+    drawnItems.addLayer(layer);
+
+  var latlngs = layer.getLatLngs();
+  var length_meters = 0;
+
+  for (var i = 0; i < latlngs.length - 1; i++) {
+    var j = i + 1;
+    var p1 = L.latLng(latlngs[i].lat, latlngs[i].lng);
+    var p2 = L.latLng(latlngs[j].lat, latlngs[j].lng);
+    length_meters += p1.distanceTo(p2);
+  }
+  
+  var length_display;
+  if (length_meters < 1000) {
+    length_display = length_meters.toFixed(0) + ' м';
+  } else {
+    length_display = (length_meters / 1000).toFixed(2) + ' Км';
+  }
+
+  layer.bindPopup('Длина: ' + length_display);
+}
+});
+
+  
+ 
+
+
+  const baseLayers = {
         "ЕЭКО": L.tileLayer("https://ngw.fppd.cgkipd.ru/tile/56/{z}/{x}/{y}.png", {
         }),
         "2ГИС": L.tileLayer("https://tile3.maps.2gis.com/tiles?x={x}&y={y}&z={z}&v=1.1", {
@@ -182,8 +272,13 @@
         }),
   };
 
-      L.control.layers(baseLayers).addTo(map);
+  L.control.layers(baseLayers).addTo(map);
 
+  var layersButton = document.getElementsByClassName('leaflet-control-layers-toggle')[0];
+  var img = document.createElement('img');
+      img.src = 'lib/images/layers-2x.svg';
+      img.style.width = '75%';
+      layersButton.appendChild(img);
       L.control.coordinates({
         position: "bottomright",
         labelTemplateLat: "Широта: {y}",
@@ -221,60 +316,70 @@
         });
       });
 
-const waterwaysLayer = L.geoJSON();
-
-const waterALayer = L.geoJSON();
+      const waterwaysLayer = L.geoJSON(null, {
+  onEachFeature: function(feature, layer) {
+    let popupContent = '';
+    for (let key in feature.properties) {
+      popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
+    }
+    layer.bindPopup(popupContent);
+    layer.on('click', function(e) {
+      map.flyToBounds(this.getBounds(), {padding: [50, 50]});
+    });
+  }
+});
 
 fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/waterways.geojson")
   .then(response => response.json())
   .then(data => {
     waterwaysLayer.addData(data);
-    waterwaysLayer.eachLayer(function(layer) {
-      layer.on('click', function(e) {
-        map.flyToBounds(this.getBounds(), {padding: [50, 50]});
-      });
-    });
   })
   .catch(error => console.log(error));
+
+const waterALayer = L.geoJSON(null, {
+  onEachFeature: function(feature, layer) {
+    let popupContent = '';
+    for (let key in feature.properties) {
+      popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
+    }
+    layer.bindPopup(popupContent);
+    layer.on('click', function(e) {
+      map.flyToBounds(this.getBounds(), {padding: [50, 50]});
+    });
+  }
+});
 
 fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/water_a.geojson")
   .then(response => response.json())
   .then(data => {
     waterALayer.addData(data);
-    waterALayer.eachLayer(function(layer) {
-      layer.on('click', function(e) {
-        map.flyToBounds(this.getBounds(), {padding: [50, 50]});
-      });
-    });
   })
   .catch(error => console.log(error));
 
 const waterwaysGroup = L.layerGroup([waterwaysLayer]);
 const waterAGroup = L.layerGroup([waterALayer]);
 
-const controlLayers2 = L.control.layers(null, {
-  "Гидрография (линии)": waterwaysGroup,
-  "Гидрография (полигоны)": waterAGroup
-});
+const overlays = [
+  {
+    groupName: "Гидрография",
+    expanded: false,
+    layers: {
+      "Гидрография (линии)": waterwaysGroup,
+      "Гидрография (полигоны)": waterAGroup
+    }
+  }
+];
 
-controlLayers2.addTo(map);
-
-
-const toggle1 = L.control.layers.toggle(undefined, undefined, {
-  collapsed: false,
-  exclusiveGroups: ["ЕЭКО", "2ГИС", "OSM", "Google", "Mapbox", "ПКК"],
-  className: "my-custom-class-1 my-layers-toggle",
-  containerWidth: "auto",
-  containerHeight: "auto"
+L.Control.styledLayerControl(null, overlays, {
+  collapsed: true,
+  position: 'topright'
 }).addTo(map);
 
-const toggle2 = L.control.layers.toggle(undefined, undefined, {
-  collapsed: false,
-  exclusiveGroups: ["Гидрография (линии)", "Гидрография (полигоны)"],
-  className: "my-custom-class-2 my-layers-toggle",
-  containerWidth: "auto",
-  containerHeight: "auto"
-}).addTo(map);
+var overlaysButton = document.getElementsByClassName('leaflet-control-layers-toggle')[1];
+var img = document.createElement('img');
+img.src = 'lib/images/layer.svg';
+img.style.width = '80%';
+overlaysButton.appendChild(img);
 
 </script>
 </body>
