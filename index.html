@@ -18,7 +18,7 @@
       }
       .centered-text {
         font-family: Tahoma, sans-serif;
-        font-size: 48px;
+        font-size: 44px;
         color: rgb(255, 255, 255);
         position: absolute;
         top: 50%;
@@ -27,26 +27,30 @@
         text-align: center;
       }
       .start-button {
-        background-color: #fff;
-        color: #000;
+        background-color: transparent;
+        color: #fff;
         font-family: Tahoma, sans-serif;
-        font-size: 24px;
+        font-size: 18px;
         border-radius: 50%;
         padding: 20px;
-        border: none;
+        border: 3px solid #fff;
         cursor: pointer;
-        position: fixed;
-        top: 50%;
+        position: absolute;
+        top: 63%;
         left: 50%;
         transform: translate(-50%, -50%);
+      }
+
+      .start-button:hover {
+        background-color: #fff;
+        color: #000;
       }
     </style>
   </head>
   <body>
     <div class="bg-image">
-      <div class="centered-text">Геопортал города Тюмени
-      <button class="start-button" onclick="location.href='geoportal.html'">Начать</button>
-    </div>
+      <div class="centered-text">Геопортал города Тюмени</div>
+      <button class="start-button" onclick="location.href='geoportal.html'">Перейти<br>на карту</button>
     </div>
   </body>
 </html>
