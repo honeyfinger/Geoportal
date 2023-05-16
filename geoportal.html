@@ -17,6 +17,7 @@
     <script src="lib/geosearch.umd.js"></script>
     <script src="lib/leaflet.draw.js"></script>
     <script src="lib/styledLayerControl.js"></script>
+	<script src="lib/bundle.js"></script>
 
     <title>Геопортал города Тюмени</title>
 
@@ -231,10 +232,6 @@ map.on('draw:created', function (e) {
 }
 });
 
-  
- 
-
-
   const baseLayers = {
         "ЕЭКО": L.tileLayer("https://ngw.fppd.cgkipd.ru/tile/56/{z}/{x}/{y}.png", {
         }),
@@ -277,7 +274,7 @@ map.on('draw:created', function (e) {
             L.geoJSON(geojson, {
               style: function(feature) {
                 return {
-                  fillColor: "#fafafa",
+                  fillColor: "#efefef",
                   fillOpacity: 1,
                   weight: 0
                 };
@@ -293,6 +290,80 @@ map.on('draw:created', function (e) {
           }).addTo(map);
         });
       });
+
+      fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/district_line.geojson")
+        .then(function(resp) {
+          resp.json().then(function(geojson) {
+            L.geoJSON(geojson, {
+              style: function(feature) {
+                return {
+                  color: "#8562c4",
+                  fillOpacity: 1,
+                  weight: 1.5
+                };
+              },
+            onEachFeature: function(feature, layer) {
+              const name = feature.properties.NAME;
+              if (name) {
+                layer.bindTooltip(feature.properties.NAME, {
+                  permanent: true
+                });
+              }
+            },
+          }).addTo(map);
+        });
+      });
+	  
+      const citydistrictLayer = L.geoJSON(null, {
+  onEachFeature: function(feature, layer) {
+    let popupContent = '';
+    for (let key in feature.properties) {
+      popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
+    }
+    layer.bindPopup(popupContent);
+  }
+});
+
+fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/city_district.geojson")
+  .then(response => response.json())
+  .then(data => {
+    citydistrictLayer.addData(data);
+  })
+  .catch(error => console.log(error));
+
+const cityLayer = L.geoJSON(null, {
+  onEachFeature: function(feature, layer) {
+    let popupContent = '';
+    for (let key in feature.properties) {
+      popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
+    }
+    layer.bindPopup(popupContent);
+  }
+});
+
+fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/city.geojson")
+  .then(response => response.json())
+  .then(data => {
+    cityLayer.addData(data);
+  })
+  .catch(error => console.log(error));
+
+const districtLayer = L.geoJSON(null, {
+  onEachFeature: function(feature, layer) {
+    let popupContent = '';
+    for (let key in feature.properties) {
+      popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
+    }
+    layer.bindPopup(popupContent);
+  }
+});
+
+fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/district.geojson")
+  .then(response => response.json())
+  .then(data => {
+    districtLayer.addData(data);
+  })
+  .catch(error => console.log(error));
 
       const waterwaysLayer = L.geoJSON(null, {
   onEachFeature: function(feature, layer) {
@@ -334,8 +405,123 @@ fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/water_a.ge
   })
   .catch(error => console.log(error));
 
+
 const waterwaysGroup = L.layerGroup([waterwaysLayer]);
 const waterAGroup = L.layerGroup([waterALayer]);
+const citydistrictGroup = L.layerGroup([citydistrictLayer]);
+const cityGroup = L.layerGroup([cityLayer]);
+const districtGroup = L.layerGroup([districtLayer]);
+
+let selectedLayer;
+
+waterwaysLayer.on('click', function(event) {
+  let clickedLayer = event.layer;
+  
+  if (selectedLayer === clickedLayer) {
+  }
+  
+  if (selectedLayer) {
+    selectedLayer.setStyle({
+      color: '#3388ff',
+      weight: 1
+    });
+  }
+  
+  clickedLayer.setStyle({
+    color: 'red',
+    weight: 2
+  });
+  selectedLayer = clickedLayer;
+  
+  clickedLayer.openPopup();
+});
+
+waterALayer.on('click', function(event) {
+  let clickedLayer = event.layer;
+  if (selectedLayer === clickedLayer) {
+    return;
+  }
+  if (selectedLayer) {
+    selectedLayer.setStyle({
+      color: '#3388ff',
+      weight: 1
+    });
+  }
+  clickedLayer.setStyle({
+    color: 'red',
+    weight: 2
+  });
+  selectedLayer = clickedLayer;
+  clickedLayer.openPopup();
+});
+
+citydistrictLayer.on('click', function(event) {
+  let clickedLayer = event.layer;
+  if (selectedLayer === clickedLayer) {
+    return;
+  }
+  if (selectedLayer) {
+    selectedLayer.setStyle({
+      color: '#3388ff',
+      weight: 1
+    });
+  }
+  clickedLayer.setStyle({
+    color: 'red',
+    weight: 2
+  });
+  selectedLayer = clickedLayer;
+  clickedLayer.openPopup();
+});
+
+cityLayer.on('click', function(event) {
+  let clickedLayer = event.layer;
+  if (selectedLayer === clickedLayer) {
+    return;
+  }
+  if (selectedLayer) {
+    selectedLayer.setStyle({
+      color: '#3388ff',
+      weight: 1
+    });
+  }
+  clickedLayer.setStyle({
+    color: 'red',
+    weight: 2
+  });
+  selectedLayer = clickedLayer;
+  clickedLayer.openPopup();
+});
+
+districtLayer.on('click', function(event) {
+  let clickedLayer = event.layer;
+  if (selectedLayer === clickedLayer) {
+    return;
+  }
+  if (selectedLayer) {
+    selectedLayer.setStyle({
+      color: '#3388ff',
+      weight: 1
+    });
+  }
+  clickedLayer.setStyle({
+    color: 'red',
+    weight: 2
+  });
+  selectedLayer = clickedLayer;
+  clickedLayer.openPopup();
+});
+
+map.on('click', function(event) {
+  if (selectedLayer && !event.layer) {
+    selectedLayer.setStyle({
+      color: '#3388ff',
+      weight: 1
+    });
+    selectedLayer.closePopup();
+    selectedLayer = null;
+  }
+});
 
 const overlays = [
   {
@@ -344,6 +530,15 @@ const overlays = [
     layers: {
       "Гидрография (линии)": waterwaysGroup,
       "Гидрография (полигоны)": waterAGroup
+    }
+  },
+  {
+    groupName: "Административное деление",
+    expanded: false,
+    layers: {
+      "Границы городского округа": citydistrictGroup,
+      "Границы города": cityGroup,
+	  "Границы округов": districtGroup
     }
   }
 ];
