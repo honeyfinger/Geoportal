@@ -8,16 +8,21 @@
     <link rel="stylesheet" href="lib/images/logo.png"/>
     <link rel="stylesheet" href="lib/geosearch.css"/>
     <link rel="stylesheet" href="lib/leaflet.draw.css"/>
+	<link rel="stylesheet" href="lib/leaflet-routing-machine.css"/>
     <link rel="stylesheet" href="lib/styledLayerControl.css"/>
+	<link rel="stylesheet" href="lib/L.Control.Locate.css"/>
     
     <script src="lib/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://raw.githubusercontent.com/calvinmetcalf/leaflet-ajax/master/dist/leaflet.ajax.min.js"></script>
     <script src="lib/Leaflet.Coordinates-0.1.5.src.js"></script>
+	<script src="lib/leaflet.browser.print.js"></script>
+	<script src="lib/L.Control.Locate.min.js"></script>
     <script src="lib/geosearch.umd.js"></script>
     <script src="lib/leaflet.draw.js"></script>
     <script src="lib/styledLayerControl.js"></script>
-	  <script src="lib/bundle.js"></script>
+	<script src="lib/leaflet-routing-machine.js"></script>
+	<script src="lib/bundle.js"></script>
 
     <title>Геопортал города Тюмени</title>
 
@@ -267,6 +272,15 @@ map.on('draw:created', function (e) {
       }).addTo(map);
 
       L.control.scale().addTo(map);
+	  
+	  L.control.locate({
+		position: 'topright'
+	  }).addTo(map);
+
+	  L.control.browserPrint({
+		printModes: ["Portrait", "Landscape"],
+		position: 'topright',
+	  }).addTo(map);
 
       fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/fon.geojson")
         .then(function(resp) {
@@ -869,6 +883,8 @@ img.src = 'lib/images/layer.svg';
 img.style.width = '80%';
 overlaysButton.appendChild(img);
 
+
+	
 </script>
 </body>
 </html>
