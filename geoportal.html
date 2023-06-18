@@ -700,10 +700,30 @@ fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/water_a.ge
   }
 });
 
-  fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/zone_pol.geojson")
+  fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/zona_terr.geojson")
   .then(response => response.json())
   .then(data => {
-    polLayer.addData(data);
+    terrLayer.addData(data);
+  })
+  .catch(error => console.log(error));
+
+  const terrLayer = L.geoJSON(null, {
+  onEachFeature: function(feature, layer) {
+    let popupContent = '';
+    for (let key in feature.properties) {
+      popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
+    }
+    layer.bindPopup(popupContent);
+    layer.on('click', function(e) {
+      map.flyToBounds(this.getBounds(), {padding: [50, 50]});
+    });
+  }
+});
+
+  fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/transports.geojson")
+  .then(response => response.json())
+  .then(data => {
+    transportsLayer.addData(data);
   })
   .catch(error => console.log(error));
 
@@ -741,6 +761,7 @@ const poisGroup = L.layerGroup([poisLayer]);
 const transportsGroup = L.layerGroup([transportsLayer]);
 const kvlGroup = L.layerGroup([kvlLayer]);
 const polGroup = L.layerGroup([polLayer]);
+const terrGroup = L.layerGroup([terrLayer]);
 
 let selectedLayer;
 
@@ -1013,12 +1034,30 @@ polLayer.on('click', function(event) {
   clickedLayer.openPopup();
 });
 
+terrLayer.on('click', function(event) {
+  let clickedLayer = event.layer;
+  if (selectedLayer === clickedLayer) {
+    return;
+  }
+  if (selectedLayer) {
+    selectedLayer.setStyle({
+      color: '#3388ff',
+      weight: 1
+    });
+  }
+  clickedLayer.setStyle({
+    color: 'red',
+    weight: 2
+  });
+  selectedLayer = clickedLayer;
+  clickedLayer.openPopup();
+});
+
 map.on('click', function(event) {
   if (selectedLayer && !event.layer) {
     selectedLayer.setStyle({
       color: '#3388ff',
-      weight: 1,
-      fillOpacity: 0
+      weight: 1
     });
     selectedLayer.closePopup();
     selectedLayer = null;
@@ -1057,6 +1096,7 @@ const overlays = [
     expanded: false,
     layers: {
       "Функциональные зоны": polGroup,
+      "Территориальные зоны": terrGroup,
       "Кадастровое деление": kvlGroup
     }
   },
