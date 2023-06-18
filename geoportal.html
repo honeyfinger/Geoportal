@@ -288,8 +288,8 @@ button.onAdd = function(map) {
   link.style.display = "flex";
   link.style.justifyContent = "center";
   link.style.alignItems = "center";
-  link.style.width = "40px";
-  link.style.height = "40px";
+  link.style.width = "38px";
+  link.style.height = "38px";
   link.style.borderRadius = "5px";
   link.style.background = "#fff";
   link.style.boxShadow = "0px 2px 5px rgba(0, 0, 0, 0.3)";
@@ -667,6 +667,46 @@ fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/water_a.ge
   })
   .catch(error => console.log(error));
 
+  const kvlLayer = L.geoJSON(null, {
+  onEachFeature: function(feature, layer) {
+    let popupContent = '';
+    for (let key in feature.properties) {
+      popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
+    }
+    layer.bindPopup(popupContent);
+    layer.on('click', function(e) {
+      map.flyToBounds(this.getBounds(), {padding: [50, 50]});
+    });
+  }
+});
+
+  fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/zona_kvl.geojson")
+  .then(response => response.json())
+  .then(data => {
+    kvlLayer.addData(data);
+  })
+  .catch(error => console.log(error));
+
+  const polLayer = L.geoJSON(null, {
+  onEachFeature: function(feature, layer) {
+    let popupContent = '';
+    for (let key in feature.properties) {
+      popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
+    }
+    layer.bindPopup(popupContent);
+    layer.on('click', function(e) {
+      map.flyToBounds(this.getBounds(), {padding: [50, 50]});
+    });
+  }
+});
+
+  fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/zone_pol.geojson")
+  .then(response => response.json())
+  .then(data => {
+    polLayer.addData(data);
+  })
+  .catch(error => console.log(error));
+
   const transportsLayer = L.geoJSON(null, {
   onEachFeature: function(feature, layer) {
     let popupContent = '';
@@ -699,6 +739,8 @@ const naturalGroup = L.layerGroup([naturalLayer]);
 const railwaysGroup = L.layerGroup([railwaysLayer]);
 const poisGroup = L.layerGroup([poisLayer]);
 const transportsGroup = L.layerGroup([transportsLayer]);
+const kvlGroup = L.layerGroup([kvlLayer]);
+const polGroup = L.layerGroup([polLayer]);
 
 let selectedLayer;
 
@@ -933,11 +975,50 @@ highwaysLayer.on('click', function(event) {
   clickedLayer.openPopup();
 });
 
+kvlLayer.on('click', function(event) {
+  let clickedLayer = event.layer;
+  if (selectedLayer === clickedLayer) {
+    return;
+  }
+  if (selectedLayer) {
+    selectedLayer.setStyle({
+      color: '#3388ff',
+      weight: 1
+    });
+  }
+  clickedLayer.setStyle({
+    color: 'red',
+    weight: 2
+  });
+  selectedLayer = clickedLayer;
+  clickedLayer.openPopup();
+});
+
+polLayer.on('click', function(event) {
+  let clickedLayer = event.layer;
+  if (selectedLayer === clickedLayer) {
+    return;
+  }
+  if (selectedLayer) {
+    selectedLayer.setStyle({
+      color: '#3388ff',
+      weight: 1
+    });
+  }
+  clickedLayer.setStyle({
+    color: 'red',
+    weight: 2
+  });
+  selectedLayer = clickedLayer;
+  clickedLayer.openPopup();
+});
+
 map.on('click', function(event) {
   if (selectedLayer && !event.layer) {
     selectedLayer.setStyle({
       color: '#3388ff',
-      weight: 1
+      weight: 1,
+      fillOpacity: 0
     });
     selectedLayer.closePopup();
     selectedLayer = null;
@@ -945,14 +1026,6 @@ map.on('click', function(event) {
 });
 
 const overlays = [
-  {
-    groupName: "Гидрография",
-    expanded: false,
-    layers: {
-      "Гидрография (линии)": waterwaysGroup,
-      "Гидрография (полигоны)": waterAGroup
-    }
-  },
   {
     groupName: "Административное деление",
     expanded: false,
@@ -963,12 +1036,28 @@ const overlays = [
     }
   },
   {
+    groupName: "Гидрография",
+    expanded: false,
+    layers: {
+      "Гидрография (линии)": waterwaysGroup,
+      "Гидрография (полигоны)": waterAGroup
+    }
+  },
+  {
     groupName: "Транспортная инфраструктура",
     expanded: false,
     layers: {
       "Автомобильные дороги": highwaysGroup,
       "Железные дорои": railwaysGroup,
       "Объекты транспортной инфраструктуры": transportsGroup
+    }
+  },
+  {
+    groupName: "Зоны и территории",
+    expanded: false,
+    layers: {
+      "Функциональные зоны": polGroup,
+      "Кадастровое деление": kvlGroup
     }
   },
   {
