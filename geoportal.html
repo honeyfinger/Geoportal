@@ -277,6 +277,102 @@ map.on('draw:created', function (e) {
 		position: 'topright'
 	  }).addTo(map);
 
+    var button = L.control({position: 'topright'});
+button.onAdd = function(map) {
+  var div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+
+  var linkText = "https://tmn72.github.io/geoportal/geoportal.html";
+
+  var link = document.createElement("a");
+  link.href = "#";
+  link.style.display = "flex";
+  link.style.justifyContent = "center";
+  link.style.alignItems = "center";
+  link.style.width = "40px";
+  link.style.height = "40px";
+  link.style.borderRadius = "5px";
+  link.style.background = "#fff";
+  link.style.boxShadow = "0px 2px 5px rgba(0, 0, 0, 0.3)";
+  
+  var img = document.createElement("img");
+  img.src = "lib/images/link.svg";
+  img.style.width = "32px";
+  img.style.height = "32px";
+  
+  link.appendChild(img);
+  
+  link.addEventListener('click', function() {
+    
+    var modal = document.createElement("div");
+    modal.style.position = "fixed";
+    modal.style.zIndex = "9999";
+    modal.style.width = "100%";
+    modal.style.height = "100%";
+    modal.style.top = "0";
+    modal.style.left = "0";
+    modal.style.background = "rgba(0, 0, 0, 0.8)";
+    modal.style.display = "flex";
+    modal.style.alignItems = "center";
+    modal.style.justifyContent = "center";
+
+    var linkBlock = document.createElement("div");
+    linkBlock.style.padding = "20px";
+    linkBlock.style.background = "#fff";
+    linkBlock.style.borderRadius = "5px";
+    linkBlock.style.textAlign = "center";
+    linkBlock.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
+
+    var link = document.createElement("p");
+    link.textContent = linkText;
+    linkBlock.appendChild(link);
+
+    var copyBtn = document.createElement("button");
+    copyBtn.textContent = "Копировать ссылку";
+    copyBtn.style.marginTop = "20px";
+    copyBtn.style.padding = "10px 20px";
+    copyBtn.style.background = "#efefef";
+    copyBtn.style.border = "none";
+    copyBtn.style.borderRadius = "5px";
+    copyBtn.style.cursor = "pointer";
+    copyBtn.addEventListener("click", function() {
+      var input = document.createElement('input');
+      input.setAttribute('value', linkText);
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      copyBtn.textContent = "Скопировано!";
+      setTimeout(function() {
+        copyBtn.textContent = "Копировать ссылку";
+      }, 2000);
+    });
+
+    var closeBtn = document.createElement("button");
+    closeBtn.textContent = "Закрыть";
+    closeBtn.style.marginTop = "20px";
+    closeBtn.style.padding = "10px 20px";
+    closeBtn.style.background = "#efefef";
+    closeBtn.style.border = "none";
+    closeBtn.style.borderRadius = "5px";
+    closeBtn.style.cursor = "pointer";
+    closeBtn.addEventListener("click", function() {
+      modal.remove();
+    });
+
+    linkBlock.appendChild(copyBtn);
+    linkBlock.appendChild(closeBtn);
+    modal.appendChild(linkBlock);
+
+    document.body.appendChild(modal);
+  });
+
+  div.appendChild(link);
+  
+  return div;
+};
+
+button.addTo(map);
+
 	  L.control.browserPrint({
 		printModes: ["Portrait", "Landscape"],
 		position: 'topright',
@@ -334,33 +430,65 @@ map.on('draw:created', function (e) {
     for (let key in feature.properties) {
       popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
     }
+
+    const downloadBtn = document.createElement('button');
+    downloadBtn.innerText = 'Скачать GeoJSON';
+    downloadBtn.onclick = () => {
+      const filename = 'city_district.geojson';
+      const jsonStr = JSON.stringify(feature);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+
+      downloadBtn.href = URL.createObjectURL(blob);
+      downloadBtn.download = filename;
+    };
+    downloadBtn.style.display = 'block';
+    downloadBtn.style.marginTop = '10px';
+
+    popupContent += downloadBtn.outerHTML;
+
     layer.bindPopup(popupContent);
   }
 });
 
-fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/city_district.geojson")
-  .then(response => response.json())
+fetch('https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/city_district.geojson')
+  .then(res => res.json())
   .then(data => {
     citydistrictLayer.addData(data);
   })
-  .catch(error => console.log(error));
+  .catch(err => console.log(err));
 
-const cityLayer = L.geoJSON(null, {
+  const cityLayer = L.geoJSON(null, {
   onEachFeature: function(feature, layer) {
     let popupContent = '';
     for (let key in feature.properties) {
       popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
     }
+    
+    const downloadBtn = document.createElement('button');
+    downloadBtn.innerHTML = 'Скачать GeoJSON';
+    downloadBtn.onclick = () => {
+      const filename = 'city.geojson';
+      const jsonStr = JSON.stringify(feature);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+
+      downloadBtn.href = URL.createObjectURL(blob);
+      downloadBtn.download = filename;
+    };
+    downloadBtn.style.display = 'block';
+    downloadBtn.style.marginTop = '10px';
+
+    popupContent += downloadBtn.outerHTML;
+
     layer.bindPopup(popupContent);
   }
 });
 
-fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/city.geojson")
-  .then(response => response.json())
+fetch('https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/city.geojson')
+  .then(res => res.json())
   .then(data => {
     cityLayer.addData(data);
   })
-  .catch(error => console.log(error));
+  .catch(err => console.log(err));
 
 const districtLayer = L.geoJSON(null, {
   onEachFeature: function(feature, layer) {
@@ -835,11 +963,12 @@ const overlays = [
     }
   },
   {
-    groupName: "Транспортна инфраструктура",
+    groupName: "Транспортная инфраструктура",
     expanded: false,
     layers: {
       "Автомобильные дороги": highwaysGroup,
-      "Железные дорои": railwaysGroup
+      "Железные дорои": railwaysGroup,
+      "Объекты транспортной инфраструктуры": transportsGroup
     }
   },
   {
@@ -863,13 +992,6 @@ const overlays = [
       "Здания": buildingsGroup
     }
   },
-  {
-    groupName: "Транспорт",
-    expanded: false,
-    layers: {
-      "Объекты транспортной инфраструктуры": transportsGroup
-    }
-  }, 
 ];
 
 L.Control.styledLayerControl(null, overlays, {
@@ -882,8 +1004,6 @@ var img = document.createElement('img');
 img.src = 'lib/images/layer.svg';
 img.style.width = '80%';
 overlaysButton.appendChild(img);
-
-
 	
 </script>
 </body>
