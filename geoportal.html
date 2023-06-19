@@ -496,9 +496,40 @@ const districtLayer = L.geoJSON(null, {
     for (let key in feature.properties) {
       popupContent += `<b>${key}</b>: ${feature.properties[key]}<br>`;
     }
+    
+    // Добавляем кнопку "Скачать GeoJSON"
+    popupContent += `<button onclick="downloadGeoJSON()">Скачать GeoJSON</button>`;
+
+    // Добавляем кнопку "Приблизить"
+    popupContent += `<button style="margin-left: 10px;" onclick="zoomToFeature(${JSON.stringify(feature.geometry)})">Приблизить</button>`;
+    
     layer.bindPopup(popupContent);
   }
 });
+
+function zoomToFeature(geometry) {
+  const bounds = L.geoJSON(geometry).getBounds();
+  map.fitBounds(bounds);
+}
+
+function downloadGeoJSON() {
+  fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/district.geojson")
+    .then(response => response.json())
+    .then(data => {
+      const filename = "district.geojson";
+      const json = JSON.stringify(data);
+      const blob = new Blob([json], {type: "application/json"});
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    })
+    .catch(error => console.log(error));
+}
 
 fetch("https://raw.githubusercontent.com/tmn72/geoportal/main/geojson/district.geojson")
   .then(response => response.json())
